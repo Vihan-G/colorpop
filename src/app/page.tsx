@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import CopyToast from "@/components/CopyToast";
 import DropZone from "@/components/DropZone";
+import PaletteGrid from "@/components/PaletteGrid";
 import { extractColors } from "@/lib/extract";
 import type { ExtractedColor } from "@/lib/types";
 
@@ -9,6 +11,8 @@ export default function Home() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [palette, setPalette] = useState<ExtractedColor[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleImageReady = async (img: HTMLImageElement, src: string) => {
     setImageSrc(src);
@@ -28,6 +32,34 @@ export default function Home() {
     setImageSrc(null);
     setPalette([]);
   };
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 1500);
+  }, []);
+
+  const handleCopy = useCallback(
+    async (text: string, label: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(label);
+      } catch {
+        showToast("Copy failed");
+      }
+    },
+    [showToast],
+  );
+
+  const handleSelect = useCallback((_color: ExtractedColor) => {
+    // detail panel wired in M5
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-5 py-12 sm:px-8 sm:py-20">
@@ -56,18 +88,15 @@ export default function Home() {
 
       {palette.length > 0 && (
         <section className="mx-auto w-full">
-          <ul className="grid grid-cols-4 gap-3 font-mono text-xs sm:grid-cols-8">
-            {palette.map((c) => (
-              <li
-                key={c.hex}
-                className="aspect-square rounded-lg ring-1 ring-white/5"
-                style={{ backgroundColor: c.hex }}
-                title={c.hex}
-              />
-            ))}
-          </ul>
+          <PaletteGrid
+            palette={palette}
+            onCopy={handleCopy}
+            onSelect={handleSelect}
+          />
         </section>
       )}
+
+      <CopyToast message={toast} />
     </main>
   );
 }
