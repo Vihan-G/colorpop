@@ -92,6 +92,9 @@ export default function Home() {
         <p className="mt-2 text-sm text-neutral-400 sm:text-base">
           Drop an image. Get its palette.
         </p>
+        <p className="mt-1 text-xs text-neutral-600 sm:text-sm">
+          8 dominant colors · hex, RGB, HSL · all on-device
+        </p>
       </header>
 
       <section className="mx-auto w-full max-w-xl">
