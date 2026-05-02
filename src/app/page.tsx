@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import ColorDetail from "@/components/ColorDetail";
 import CopyToast from "@/components/CopyToast";
 import DropZone from "@/components/DropZone";
 import PaletteGrid from "@/components/PaletteGrid";
@@ -12,6 +13,7 @@ export default function Home() {
   const [palette, setPalette] = useState<ExtractedColor[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ExtractedColor | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleImageReady = async (img: HTMLImageElement, src: string) => {
@@ -51,8 +53,8 @@ export default function Home() {
     [showToast],
   );
 
-  const handleSelect = useCallback((_color: ExtractedColor) => {
-    // detail panel wired in M5
+  const handleSelect = useCallback((color: ExtractedColor) => {
+    setSelected(color);
   }, []);
 
   useEffect(() => {
@@ -95,6 +97,12 @@ export default function Home() {
           />
         </section>
       )}
+
+      <ColorDetail
+        color={selected}
+        onClose={() => setSelected(null)}
+        onCopy={handleCopy}
+      />
 
       <CopyToast message={toast} />
     </main>
