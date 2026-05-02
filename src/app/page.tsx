@@ -4,10 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AmbianceBackground from "@/components/AmbianceBackground";
 import ColorDetail from "@/components/ColorDetail";
 import CopyToast from "@/components/CopyToast";
+import DownloadButton from "@/components/DownloadButton";
 import DropZone from "@/components/DropZone";
+import ExamplePresets from "@/components/ExamplePresets";
+import ExportCard from "@/components/ExportCard";
 import PaletteGrid from "@/components/PaletteGrid";
 import { BASE_AMBIANCE, computeAmbiance } from "@/lib/ambiance";
 import { extractColors } from "@/lib/extract";
+import { type Preset, presetPalette } from "@/lib/presets";
 import type { ExtractedColor } from "@/lib/types";
 
 export default function Home() {
@@ -17,6 +21,7 @@ export default function Home() {
   const [toast, setToast] = useState<string | null>(null);
   const [selected, setSelected] = useState<ExtractedColor | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   const handleImageReady = async (img: HTMLImageElement, src: string) => {
     setImageSrc(src);
@@ -59,6 +64,11 @@ export default function Home() {
     setSelected(color);
   }, []);
 
+  const handlePreset = useCallback((preset: Preset) => {
+    setImageSrc(null);
+    setPalette(presetPalette(preset));
+  }, []);
+
   useEffect(() => {
     return () => {
       if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -69,6 +79,8 @@ export default function Home() {
     () => (palette.length > 0 ? computeAmbiance(palette) : BASE_AMBIANCE),
     [palette],
   );
+
+  const showPresets = palette.length === 0 && !imageSrc;
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-5 py-12 sm:px-8 sm:py-20">
@@ -96,6 +108,8 @@ export default function Home() {
         )}
       </section>
 
+      {showPresets && <ExamplePresets onSelect={handlePreset} />}
+
       {palette.length > 0 && (
         <section className="mx-auto w-full">
           <PaletteGrid
@@ -105,6 +119,20 @@ export default function Home() {
           />
         </section>
       )}
+
+      {palette.length > 0 && <DownloadButton targetRef={exportRef} />}
+
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: -10000,
+          top: 0,
+          pointerEvents: "none",
+        }}
+      >
+        <ExportCard ref={exportRef} palette={palette} />
+      </div>
 
       <ColorDetail
         color={selected}
