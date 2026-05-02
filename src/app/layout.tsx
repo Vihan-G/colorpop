@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,9 +15,42 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "colorpop — drop an image, get its palette",
+  title: {
+    default: "colorpop — drop an image, get its palette",
+    template: "%s · colorpop",
+  },
   description:
-    "Drop any image and instantly extract its 8 dominant colors. Copy hex, RGB, HSL. Download a palette card. Pure client-side, no upload, no signup.",
+    "Drop any image and instantly extract its 8 dominant colors. Copy hex, RGB, HSL. Download the palette as a PNG. Pure client-side — no upload, no signup.",
+  keywords: [
+    "color palette",
+    "image color extractor",
+    "hex picker",
+    "design tools",
+    "palette generator",
+    "median cut",
+  ],
+  authors: [{ name: "Vihan Goenka", url: "https://github.com/Vihan-G" }],
+  creator: "Vihan Goenka",
+  openGraph: {
+    type: "website",
+    title: "colorpop — drop an image, get its palette",
+    description:
+      "Drop any image and instantly extract its 8 dominant colors. The interface reacts to your image's mood.",
+    siteName: "colorpop",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "colorpop — drop an image, get its palette",
+    description:
+      "Drop any image and instantly extract its 8 dominant colors.",
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0c0c0c",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
