@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AmbianceBackground from "@/components/AmbianceBackground";
 import ColorDetail from "@/components/ColorDetail";
 import CopyToast from "@/components/CopyToast";
 import DropZone from "@/components/DropZone";
 import PaletteGrid from "@/components/PaletteGrid";
+import { BASE_AMBIANCE, computeAmbiance } from "@/lib/ambiance";
 import { extractColors } from "@/lib/extract";
 import type { ExtractedColor } from "@/lib/types";
 
@@ -63,8 +65,14 @@ export default function Home() {
     };
   }, []);
 
+  const ambiance = useMemo(
+    () => (palette.length > 0 ? computeAmbiance(palette) : BASE_AMBIANCE),
+    [palette],
+  );
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-5 py-12 sm:px-8 sm:py-20">
+      <AmbianceBackground ambiance={ambiance} />
       <header className="text-center">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
           colorpop
